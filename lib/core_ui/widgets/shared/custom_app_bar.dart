@@ -35,7 +35,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             ))
         .toList();
     Widget widgetTitle = Padding(
-        padding: const EdgeInsets.only(left: 100),
+        padding: const EdgeInsets.only(left: 2),
         child: Text(
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -52,17 +52,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       automaticallyImplyLeading: false,
       actions: [
         CustomSizedBoxSpace(width: 16.w),
-        leading != null
-            ? leading!
-            : Builder(
-                // TODO YP 20240305 Put enumerate icons
-                builder: (context) => CustomAppbarIcon(
-                      assetName: ImageConstants.imageLogoTrueId,
-                      onTap: () => Scaffold.of(context).openDrawer(),
-                    )),
         title != null ? Expanded(child: widgetTitle) : const SizedBox.shrink(),
         if (title == null) Expanded(child: Container()),
         ...actionWidgets,
+        Builder(
+          // TODO YP 20240305 Put enumerate icons
+            builder: (context) => CustomAppbarIcon(
+              assetName: ImageConstants.icUserProfile,
+              onTap: () => Scaffold.of(context).openDrawer(),
+            )),
+        CustomSizedBoxSpace(width: 20.w),
       ],
     );
   }

@@ -9,11 +9,20 @@ import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_sized_box_space.d
 import 'package:hackaton_2024_mv/resource/color_constants.dart';
 import 'package:hackaton_2024_mv/resource/image_constants.dart';
 
-class PrincipalScreen extends StatelessWidget {
+class PrincipalScreen extends StatefulWidget {
   static const String name = 'PrincipalScreen';
   static const String link = '/$name';
 
-  const PrincipalScreen({super.key});
+  const PrincipalScreen({
+    super.key,
+  });
+
+  @override
+  State<StatefulWidget> createState() => _PrincipalScreenState();
+}
+
+class _PrincipalScreenState extends State<PrincipalScreen> {
+  String dropDownValue = 'Selecciona un tipo de documento';
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +36,7 @@ class PrincipalScreen extends StatelessWidget {
 
   _buildAppBar(BuildContext context) {
     return CustomAppBar(
-      title: "TRUE ID AI",
+      title: "DOCUSENSE IA",
       leading: CustomAppbarIcon(
         assetName: ImageConstants.imageLogoTrueId,
         onTap: () async {
@@ -40,22 +49,15 @@ class PrincipalScreen extends StatelessWidget {
   _buildBody(BuildContext context) {
     return Column(
       children: [
-        const SizedBox(height: 150),
+        const SizedBox(height: 120),
         _buildTitle(context),
         _buildDescription(),
         const SizedBox(height: 40),
+        _buildDropDown(),
+        const SizedBox(height: 40),
         _buildCustomGetLocalDocument(context),
         const SizedBox(height: 40),
-        _buildTextVerify(),
-        CustomMainButton(
-          text: "Validar",
-          colorText: Colors.white,
-          color: ColorConstants.primaryButtonColor,
-          margin: const EdgeInsets.symmetric(horizontal: 16),
-          onPressed: () {
-            print("Ir a login");
-          },
-        ),
+        _buildButton()
       ],
     );
   }
@@ -124,36 +126,56 @@ class PrincipalScreen extends StatelessWidget {
     );
   }
 
-  _buildTextVerify(){
+  _buildTextVerify() {
     bool isOfficial = true;
-    return Center(child: isOfficial ? Text("El Documento es: Original") : Text("El documento es una vil mentira ladron de datos personales \n llamando a la policia....."),
+    return Center(
+      child: isOfficial
+          ? const Text("El Documento es: ", style: TextStyle(color: Colors.grey),)
+          : Text(
+              "El documento es una vil mentira ladron de datos personales \n llamando a la policia....."),
     );
   }
 
- /* _buildDropDown() {
-   return DropdownButton<String>(
-      icon: Icon(Icons.arrow_downward, color: Colors.purple),
+  _buildDropDown() {
+    return DropdownButton<String>(
+      value: dropDownValue,
+      icon: const Icon(Icons.arrow_circle_left_sharp, color: Colors.grey),
       iconSize: 24,
       elevation: 16,
-      style: TextStyle(color: Colors.purple, fontWeight: FontWeight.bold),
+      style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.w400),
       underline: Container(
-        height: 2,
-        color: Colors.purple,
+        height: 5,
+        color: Colors.grey,
       ),
       onChanged: (String? newValue) {
         setState(() {
-          dropdownValue = newValue;
+          dropDownValue = newValue!;
         });
       },
-      items: <String>['One', 'Two', 'Free', 'Four']
-          .map<DropdownMenuItem<String>>((String value) {
+      items: <String>[
+        'Selecciona un tipo de documento',
+        'Cedula',
+        'Pasaporte',
+        'Licencia de conduccion',
+        'Cedula de extranjeria'
+      ].map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
           child: Text(value),
         );
       }).toList(),
-    )
-  }*/
+    );
+  }
 
-
+  _buildButton() {
+    return CustomMainButton(
+      text: "Validar",
+      colorText: Colors.white,
+      color: ColorConstants.primaryButtonColor,
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      onPressed: () {
+        print("Ir a login");
+      },
+    );
+  }
 }

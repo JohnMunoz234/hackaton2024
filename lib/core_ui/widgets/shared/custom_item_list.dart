@@ -33,7 +33,7 @@ class _CustomItemListState extends State<CustomItemList> {
             borderRadius: BorderRadius.circular(15.0),
           ),
         child: Container(
-          color: widget.wasPressed ? Colors.blueAccent : Colors.white12,
+          color: widget.wasPressed! ? Colors.blueAccent : Colors.white12,
           width: 100,
           child: Row(
             children: [

@@ -9,9 +9,7 @@ abstract class NavigationRouters {
     GoRoute(
       name: PrincipalScreen.name,
       path: PrincipalScreen.link,
-      builder: (context, state) => PrincipalScreen(
-        onNavLogin: (context) => context.push(AuthenticationRouter.login),
-      ),
+      builder: (context, state) => PrincipalScreen(),
     ),
     GoRoute(
       name: FoldersScreen.name,

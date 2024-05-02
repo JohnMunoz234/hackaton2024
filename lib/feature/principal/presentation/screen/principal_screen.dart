@@ -224,7 +224,12 @@ class _PrincipalScreenState extends ConsumerState<PrincipalScreen> {
         if (dropDownValue != Parameters.itemDropDown1 &&
             state.state.listPath!.isNotEmpty) {
           // TODO JM ENVIA PETICION A BACK
-          state.sendDocument(state.state.listPath!.first, dropDownValue);
+          if (state.state.listPath?.length == 1) {
+            state.sendDocument(state.state.listPath!.first, dropDownValue);
+          } else {
+            state.sendDocuments(context, dropDownValue);
+          }
+
         } else {
           DialogUtil.showCustomDialog(
               context: context,

@@ -1,16 +1,23 @@
 class SendDocumentsParams {
-  final String typeDocument;
-  final List<String> base64Document;
+  final List<RealRequest> base64Document;
 
   const SendDocumentsParams({
-    required this.typeDocument,
     required this.base64Document,
   });
 
-  Map<String, dynamic> toMap() {
-    return {
-      "typeDocument": typeDocument,
-      "base64Document": base64Document,
-    };
+  List<Map<String, dynamic>> toMap() {
+    return base64Document.map((e) => {
+      'filename': e.fileName,
+      'base64-content': e.base64Documents
+    }).toList();
   }
+}
+
+class RealRequest {
+  final String fileName;
+  final String base64Documents;
+
+  RealRequest({required this.fileName, required this.base64Documents});
+
+
 }

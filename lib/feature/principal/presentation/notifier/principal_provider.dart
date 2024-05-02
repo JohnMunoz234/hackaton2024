@@ -1,28 +1,36 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hackaton_2024_mv/core/util/dialog_util.dart';
 import 'package:hackaton_2024_mv/core/api/api_error.dart';
 import 'package:hackaton_2024_mv/feature/principal/di/principal_module.dart';
 import 'package:hackaton_2024_mv/feature/principal/domain/params/send_document_params.dart';
+import 'package:hackaton_2024_mv/feature/principal/domain/params/send_documents_params.dart';
 import 'package:hackaton_2024_mv/feature/principal/domain/response/principal_response.dart';
 import 'package:hackaton_2024_mv/feature/principal/domain/usecase/send_document.dart';
+import 'package:hackaton_2024_mv/feature/principal/domain/usecase/send_documents.dart';
 
 final principalProvider =
     StateNotifierProvider<PrincipalStateNotifier, PrincipalState>((ref) {
   final StateNotifierProviderRef _ref = ref;
-  final documents = ref.watch(sendDocumentUseCaseProvider);
-  return PrincipalStateNotifier(ref: ref, document: documents);
+  final document = ref.watch(sendDocumentUseCaseProvider);
+  final documents = ref.watch(sendDocumentsUseCaseProvider);
+  return PrincipalStateNotifier(ref: ref, document: document, documents: documents);
 });
 
 class PrincipalStateNotifier extends StateNotifier<PrincipalState> {
   StateNotifierProviderRef ref;
   SendDocument document;
+  SendDocuments documents;
 
-  PrincipalStateNotifier({required this.ref, required this.document})
+  PrincipalStateNotifier({required this.ref, required this.document, required this.documents})
       : super(PrincipalState()) {
     //init();
   }
+
+  get paths => null;
 
   init() {
     state = state.copyWith(
@@ -84,9 +92,28 @@ class PrincipalStateNotifier extends StateNotifier<PrincipalState> {
     );
   }
 
-  Future<List<String>?> sendDocuments(List<String> path) async {
-    return [];
-  }
+  Future<List<String>?> sendDocuments(BuildContext context, String typeDocument) async {
+    List<RealRequest> paths = [RealRequest(fileName: '', base64Documents: '')];
+    state.listPath?.forEach((element) async {
+      File file = File(element);
+      final data = await file.readAsBytes();
+      final documentInBase64 = base64.encode(data);
+      paths.add(RealRequest(fileName: typeDocument, base64Documents: documentInBase64));
+    });
+
+    final response = await documents.call(params:SendDocumentsParams(base64Document: paths));
+    response.fold((l) =>
+    {
+      print("Falle  $l")
+    }, (r) => {
+
+      DialogUtil.showCustomDialog(
+          context: context,
+          title: "!Tus resultado estan listos!",
+          description:
+          "Documento 1")
+    });
+    }
 
   void showDialogEnum(ShowDialog showDialog) {
     state = state.copyWith(

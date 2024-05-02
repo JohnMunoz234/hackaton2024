@@ -1,10 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hackaton_2024_mv/core/util/dialog_util.dart';
 import 'package:hackaton_2024_mv/core/util/parameters.dart';
 import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_drawer.dart';
-import 'package:hackaton_2024_mv/feature/document/presentation/screen/document_screen.dart';
 import 'package:hackaton_2024_mv/feature/principal/presentation/screen/principal_screen.dart';
 
 final folderProvider =
@@ -46,10 +44,13 @@ class FolderStateNotifier extends StateNotifier<FolderState> {
     });
 
     if (info != null) {
-      listInternal![saveIndex] = FoldersInfo(name: info?.name!, isPressed: info!.isPressed);
+      listInternal![saveIndex] =
+          FoldersInfo(name: info?.name!, isPressed: info!.isPressed);
     }
 
-    listInternal![index] = FoldersInfo(name: listInternal[index].name, isPressed: !listInternal[index].isPressed);
+    listInternal![index] = FoldersInfo(
+        name: listInternal[index].name,
+        isPressed: !listInternal[index].isPressed);
     state = state.copyWith(listFolders: listInternal);
   }
 
@@ -57,7 +58,7 @@ class FolderStateNotifier extends StateNotifier<FolderState> {
     state = state.copyWith(listFolders: [...?state.listFolders, info]);
   }
 
-   String?  getSelectFolders() {
+  String? getSelectFolders() {
     String? nameFolder;
     state.listFolders?.forEach((element) {
       if (element.isPressed) {
@@ -68,10 +69,9 @@ class FolderStateNotifier extends StateNotifier<FolderState> {
   }
 
   List<String>? getFoldersBySearch(String search) {
-
     List<String> listFolders = [];
     state.listFolders!.forEach((element) {
-      if(element.name!.contains(search)) {
+      if (element.name!.contains(search)) {
         listFolders.add(element.name!);
       }
     });
@@ -80,7 +80,7 @@ class FolderStateNotifier extends StateNotifier<FolderState> {
 
   onDrawerItemTapped(BuildContext context, int drawerItemSelectedIndex) {
     if (drawerItemSelectedIndex == DrawerMenuScreensEnum.unpairDevice.index) {
-      context.pushReplacement(DocumentScreen.link);
+      context.pushReplacement(PrincipalScreen.link);
       return;
     }
     if (drawerItemSelectedIndex == DrawerMenuScreensEnum.logout.index) {
@@ -88,7 +88,6 @@ class FolderStateNotifier extends StateNotifier<FolderState> {
       return;
     }
   }
-
 }
 
 class FolderState {

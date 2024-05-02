@@ -7,9 +7,12 @@ import 'package:hackaton_2024_mv/feature/principal/domain/response/principal_res
 class SendDocument {
   final PrincipalRepository repository;
 
-  const SendDocument({required this.repository});
+  const SendDocument({
+    required this.repository,
+  });
 
-
-  Future<Either<ApiError, PrincipalResponse>> call({required SendDocumentParams params}) =>
+  Future<Either<ApiError, PrincipalResponse>> call({
+    required SendDocumentParams params,
+  }) =>
       repository.sendDocument(params: params);
 }

@@ -21,19 +21,24 @@ class PrincipalRemoteDatasource {
     final headers = {'Content-Type': 'application/json',
     'api-key':'xCLHuwo2GxZdHwSaC1DN5OcULRLRZVxPxx4m'};
 
-    final resultPrincipal = await apiManager.post(
+    final Either<ApiError, ApiResponseMap> resultPrincipal = await apiManager.post(
       url: PrincipalRemoteApiRoutes.sendDocument,
       body: params.toMap(),
       headers: headers,
     );
     print("resultPrincipal: $resultPrincipal");
-    final resultPrincipalMap = resultPrincipal.map(
-      (success) => ApiResponse.fromJson(
+    final Either<ApiError, PrincipalResponseDto> resultPrincipalMap = resultPrincipal.map(
+      (ApiResponseMap success) {
+        return ApiResponse.fromJson(
         success,
-        (json) => PrincipalResponseDto.fromJson(
-          tryCast<Map<String, PrincipalResponseDto>>(json) ?? {},
-        ),
-      ).result,
+        (json) {
+          return PrincipalResponseDto.fromJson( {
+            'result': json
+          },
+        );
+        },
+      ).result;
+      },
     );
     return resultPrincipalMap;
   }

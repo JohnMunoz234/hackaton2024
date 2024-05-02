@@ -3,11 +3,12 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hackaton_2024_mv/core/util/dialog_util.dart';
 import 'package:hackaton_2024_mv/core/api/api_error.dart';
+import 'package:hackaton_2024_mv/core/util/dialog_util.dart';
 import 'package:hackaton_2024_mv/feature/principal/di/principal_module.dart';
 import 'package:hackaton_2024_mv/feature/principal/domain/params/send_document_params.dart';
 import 'package:hackaton_2024_mv/feature/principal/domain/params/send_documents_params.dart';
+import 'package:hackaton_2024_mv/feature/principal/domain/response/documents_response.dart';
 import 'package:hackaton_2024_mv/feature/principal/domain/response/principal_response.dart';
 import 'package:hackaton_2024_mv/feature/principal/domain/usecase/send_document.dart';
 import 'package:hackaton_2024_mv/feature/principal/domain/usecase/send_documents.dart';
@@ -17,7 +18,8 @@ final principalProvider =
   final StateNotifierProviderRef _ref = ref;
   final document = ref.watch(sendDocumentUseCaseProvider);
   final documents = ref.watch(sendDocumentsUseCaseProvider);
-  return PrincipalStateNotifier(ref: ref, document: document, documents: documents);
+  return PrincipalStateNotifier(
+      ref: ref, document: document, documents: documents);
 });
 
 class PrincipalStateNotifier extends StateNotifier<PrincipalState> {
@@ -25,7 +27,8 @@ class PrincipalStateNotifier extends StateNotifier<PrincipalState> {
   SendDocument document;
   SendDocuments documents;
 
-  PrincipalStateNotifier({required this.ref, required this.document, required this.documents})
+  PrincipalStateNotifier(
+      {required this.ref, required this.document, required this.documents})
       : super(PrincipalState()) {
     //init();
   }
@@ -92,28 +95,49 @@ class PrincipalStateNotifier extends StateNotifier<PrincipalState> {
     );
   }
 
-  Future<List<String>?> sendDocuments(BuildContext context, String typeDocument) async {
-    List<RealRequest> paths = [RealRequest(fileName: '', base64Documents: '')];
-    state.listPath?.forEach((element) async {
-      File file = File(element);
-      final data = await file.readAsBytes();
-      final documentInBase64 = base64.encode(data);
-      paths.add(RealRequest(fileName: typeDocument, base64Documents: documentInBase64));
-    });
+  Future<List<String>?> sendDocuments(
+      BuildContext context, String typeDocument) async {
+    showDialogEnum(const ShowDialog(showDialogEnum: ShowDialogEnum.loading));
 
-    final response = await documents.call(params:SendDocumentsParams(base64Document: paths));
-    response.fold((l) =>
-    {
-      print("Falle  $l")
-    }, (r) => {
+    final List<Future<RealRequest>>? listRequest =
+        state.listPath?.map((String element) async {
+      return await RealRequest(
+          fileName: typeDocument,
+          base64Documents: await getBase64OfDocument(element));
+    }).toList();
 
-      DialogUtil.showCustomDialog(
-          context: context,
-          title: "!Tus resultado estan listos!",
-          description:
-          "Documento 1")
-    });
-    }
+    final Future<
+        List<
+            RealRequest>> futureListRequest = Future.wait(listRequest ??
+        []); // Ejecuta Future.wait() para obtener un Future que completará cuando todas las solicitudes se completen
+    final List<RealRequest> result = await futureListRequest;
+
+    final response = await documents.call(
+        params: SendDocumentsParams(base64Document: result));
+    response.fold(
+      (ApiError apiError) {
+        showDialogEnum(const ShowDialog(showDialogEnum: ShowDialogEnum.error));
+        return {print("Falle  $apiError")};
+      },
+      (DocumentsResponse documentsResponse) {
+        return {
+          DialogUtil.showCustomDialog(
+            context: context,
+            title: "!Tus resultado estan listos!",
+            description: "Documento 1",
+          )
+        };
+      },
+    );
+    return null;
+  }
+
+  Future<String> getBase64OfDocument(String element) async {
+    File file = File(element);
+    final data = await file.readAsBytes();
+    final documentInBase64 = base64.encode(data);
+    return documentInBase64;
+  }
 
   void showDialogEnum(ShowDialog showDialog) {
     state = state.copyWith(

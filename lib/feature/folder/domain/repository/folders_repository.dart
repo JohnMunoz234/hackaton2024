@@ -6,5 +6,8 @@ import 'package:hackaton_2024_mv/feature/folder/domain/response/folders_response
 abstract class FoldersRepository {
   const FoldersRepository();
 
-  Future<Either<ApiError, FoldersResponse>> sendFolders({required FoldersParams params});
+  Future<Either<ApiError, FoldersResponse>> getFolders();
+
+  Future<Either<ApiError, FoldersResponse>> sendFolders(
+      {required FoldersParams params});
 }

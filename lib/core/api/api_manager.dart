@@ -18,6 +18,12 @@ abstract class ApiManager {
     Map<String, dynamic>? body,
   });
 
+  Future<Either<ApiError, ApiResponseMap>> postObjetBody({
+    required String url,
+    Map<String, dynamic>? headers,
+    Object? body,
+  });
+
   Future<Either<ApiError, ApiResponseMap>> put({
     required String url,
     Map<String, dynamic>? headers,

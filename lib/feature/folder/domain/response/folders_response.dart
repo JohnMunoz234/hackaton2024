@@ -1,9 +1,11 @@
 class FoldersResponse {
-  final bool? success;
-  final int? code;
+  final List<PrefixResponse>? folders;
 
-  const FoldersResponse({
-    required this.success,
-    required this.code
-});
+  const FoldersResponse({required this.folders});
+}
+
+class PrefixResponse {
+  final String? prefix;
+
+  PrefixResponse({this.prefix});
 }

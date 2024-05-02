@@ -18,7 +18,7 @@ class PrincipalRepositoryImpl extends PrincipalRepository {
 
   @override
   Future<Either<ApiError, PrincipalResponse>> sendDocument(
-      {required SendDocumentParams params})  async {
+      {required SendDocumentParams params}) async {
     print("request: $params");
     final result = await remoteDatasource.sendDocument(params: params);
     print("result: $result");
@@ -26,13 +26,12 @@ class PrincipalRepositoryImpl extends PrincipalRepository {
   }
 
   @override
-  Future<Either<ApiError, DocumentsResponse>> sendDocuments({required SendDocumentsParams params}) async {
+  Future<Either<ApiError, DocumentsResponse>> sendDocuments({
+    required SendDocumentsParams params,
+  }) async {
     print("request: $params");
-     final result = await remoteDatasource.sendDocuments(params: params);
+    final result = await remoteDatasource.sendDocuments(params: params);
     print("resuelt: $result");
     return result.map((success) => success.toModel());
-
   }
-
-
 }

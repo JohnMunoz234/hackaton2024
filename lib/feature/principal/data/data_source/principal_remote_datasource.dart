@@ -50,7 +50,7 @@ class PrincipalRemoteDatasource {
     final headers = {'Content-Type': 'application/json',
       'api-key':'xCLHuwo2GxZdHwSaC1DN5OcULRLRZVxPxx4m'};
 
-    final resultPrincipal = await apiManager.post(
+    final resultPrincipal = await apiManager.postObjetBody(
       url: PrincipalRemoteApiRoutes.sendDocuments,
       body: params.toMap(),
       headers: headers,

@@ -196,6 +196,7 @@ class _FoldersScreenState extends ConsumerState<FoldersScreen> {
         if (dropDownValue != Parameters.itemDropDown1 &&
             state.getSelectFolders() != null) {
           // TODO JM ENVIA PETICION A BACK
+          ref.read(folderProvider.notifier).callSendFolders();
           DialogUtil.showCustomDialog(
               context: context,
               title: "!Tus resultado estan listos!",

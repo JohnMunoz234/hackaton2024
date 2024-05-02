@@ -27,18 +27,35 @@ class LoginScreenNotifier extends StateNotifier<LoginState> {
     );
   }
 
-  void login() {
+  void login({
+    required Function onSuccess,
+    required Function onFailed,
+  }) {
     _touchEveryField();
     if (!state.isFormValid) {
       return;
     }
 
-    /// Call API login
+    const userName = 'cartarus28@gmail.com';
+    const password = 'Car99022807524!';
+
+    if (state.email.value == userName && state.password.value == password) {
+      onSuccess.call();
+    } else {
+      onFailed.call();
+    }
   }
 
   void _touchEveryField() {
+    final email = EmailInput.dirty(state.email.value);
+    final password = PasswordInput.dirty(state.password.value);
+
     state = state.copyWith(
-      isFormValid: Formz.validate([state.email, state.password]),
+      email: email,
+      password: password,
+      isFormValid: Formz.validate(
+        [state.email, state.password],
+      ),
     );
   }
 }

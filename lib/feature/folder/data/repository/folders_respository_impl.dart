@@ -11,15 +11,19 @@ class FoldersRepositoryImpl extends FoldersRepository {
 
   const FoldersRepositoryImpl({
     required this.remoteDatasource,
-});
+  });
 
   @override
-  Future<Either<ApiError, FoldersResponse>> sendFolders({required FoldersParams params}) async {
-      final result = await remoteDatasource.sendFolders(params: params);
-      return result.map((success) => success.toModel());
-
+  Future<Either<ApiError, FoldersResponse>> sendFolders({
+    required FoldersParams params,
+  }) async {
+    final result = await remoteDatasource.sendFolders(params: params);
+    return result.map((success) => success.toModel());
   }
 
-
-
+  @override
+  Future<Either<ApiError, FoldersResponse>> getFolders() async {
+    final result = await remoteDatasource.getFolders();
+    return result.map((success) => success.toModel());
+  }
 }

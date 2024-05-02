@@ -9,7 +9,8 @@ class SendDocuments {
 
   const SendDocuments({required this.repository});
 
-
-  Future<Either<ApiError, DocumentsResponse>> call ({required SendDocumentsParams params}) =>
+  Future<Either<ApiError, DocumentsResponse>> call({
+    required SendDocumentsParams params,
+  }) =>
       repository.sendDocuments(params: params);
 }

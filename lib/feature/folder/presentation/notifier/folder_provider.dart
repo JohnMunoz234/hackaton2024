@@ -1,33 +1,53 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hackaton_2024_mv/core/util/parameters.dart';
+import 'package:hackaton_2024_mv/core/api/api_error.dart';
 import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_drawer.dart';
+import 'package:hackaton_2024_mv/feature/folder/di/folder_module.dart';
+import 'package:hackaton_2024_mv/feature/folder/domain/params/folders_params.dart';
+import 'package:hackaton_2024_mv/feature/folder/domain/response/folders_response.dart';
+import 'package:hackaton_2024_mv/feature/folder/domain/usecase/get_folders.dart';
+import 'package:hackaton_2024_mv/feature/folder/domain/usecase/send_folders.dart';
 import 'package:hackaton_2024_mv/feature/principal/presentation/screen/principal_screen.dart';
 
 final folderProvider =
     StateNotifierProvider<FolderStateNotifier, FolderState>((ref) {
-  return FolderStateNotifier();
+  final GetFolders getFolderUseCase = ref.watch(getFoldersUseCaseProvider);
+  final SendFolders sendFolderUseCase = ref.watch(sendFoldersUseCaseProvider);
+  return FolderStateNotifier(
+    getFolders: getFolderUseCase,
+    sendFolders: sendFolderUseCase,
+  );
 });
 
 class FolderStateNotifier extends StateNotifier<FolderState> {
-  FolderStateNotifier() : super(FolderState()) {
+  final GetFolders getFolders;
+  final SendFolders sendFolders;
+
+  FolderStateNotifier({
+    required this.getFolders,
+    required this.sendFolders,
+  }) : super(FolderState()) {
     init();
   }
 
   init() {
-    List<String> listNameFolder = [
-      Parameters.itemListFolderName1,
-      Parameters.itemListFolderName2,
-      Parameters.itemListFolderName3,
-      Parameters.itemListFolderName1,
-      Parameters.itemListFolderName2,
-      Parameters.itemListFolderName3,
-    ];
+    loadFolders();
+  }
 
-    for (var element in listNameFolder) {
-      setListFolders(FoldersInfo(name: element, isPressed: false));
-    }
+  void loadFolders() async {
+    final result = await getFolders.call();
+    result.fold((ApiError l) {
+      debugPrint('failed get list folder: ${l.message}');
+      return null;
+    }, (FoldersResponse r) {
+      debugPrint(
+          'success get list folder: ${r.folders?.map((e) => e.prefix).toList()}');
+      for (PrefixResponse element in r.folders ?? []) {
+        setListFolders(FoldersInfo(name: element.prefix, isPressed: false));
+      }
+      return null;
+    });
   }
 
   setWasPressed(int index) {
@@ -87,6 +107,19 @@ class FolderStateNotifier extends StateNotifier<FolderState> {
       context.pushReplacement(PrincipalScreen.link);
       return;
     }
+  }
+
+  callSendFolders() async {
+    final result = await sendFolders.call(
+        params: FoldersParams(folderName: state.listFolders?.first.name ?? ''));
+
+    result.fold((ApiError l) {
+      debugPrint('Failed send folders: ${l.message}');
+      return null;
+    }, (FoldersResponse r) {
+      debugPrint('Success send folders: ${r.folders?.length}');
+      return null;
+    });
   }
 }
 

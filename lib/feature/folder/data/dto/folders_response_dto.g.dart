@@ -8,11 +8,11 @@ part of 'folders_response_dto.dart';
 
 FoldersResponseDto _$FoldersResponseDtoFromJson(Map<String, dynamic> json) =>
     FoldersResponseDto(
-      statusCode: (json['statusCode'] as num?)?.toInt(),
-      statusMessage: json['statusMessage'] as String?,
-      statusDescription: json['statusDescription'] as String?,
-      result: json['result'] == null
-          ? null
-          : FoldersResultResponseDto.fromJson(
-              json['result'] as Map<String, dynamic>),
+      folders: (json['folders'] as List<dynamic>?)
+          ?.map((e) => PrefixDto.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+PrefixDto _$PrefixDtoFromJson(Map<String, dynamic> json) => PrefixDto(
+      prefix: json['Prefix'] as String?,
     );

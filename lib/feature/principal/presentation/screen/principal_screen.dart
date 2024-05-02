@@ -1,15 +1,23 @@
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hackaton_2024_mv/core/util/dialog_util.dart';
 import 'package:hackaton_2024_mv/core/util/file_util.dart';
+import 'package:hackaton_2024_mv/core/util/parameters.dart';
 import 'package:hackaton_2024_mv/core/util/permission_util.dart';
 import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom.main_button.dart';
 import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_app_bar.dart';
 import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_appbar_icon.dart';
+import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_document_item.dart';
 import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_sized_box_space.dart';
+import 'package:hackaton_2024_mv/feature/principal/presentation/notifier/principal_provider.dart';
 import 'package:hackaton_2024_mv/resource/color_constants.dart';
 import 'package:hackaton_2024_mv/resource/image_constants.dart';
 
-class PrincipalScreen extends StatefulWidget {
+class PrincipalScreen extends ConsumerStatefulWidget {
   static const String name = 'PrincipalScreen';
   static const String link = '/$name';
 
@@ -18,11 +26,11 @@ class PrincipalScreen extends StatefulWidget {
   });
 
   @override
-  State<StatefulWidget> createState() => _PrincipalScreenState();
+  ConsumerState createState() => _PrincipalScreenState();
 }
 
-class _PrincipalScreenState extends State<PrincipalScreen> {
-  String dropDownValue = 'Selecciona un tipo de documento';
+class _PrincipalScreenState extends ConsumerState<PrincipalScreen> {
+  String dropDownValue = Parameters.itemDropDown1;
 
   @override
   Widget build(BuildContext context) {
@@ -47,17 +55,25 @@ class _PrincipalScreenState extends State<PrincipalScreen> {
   }
 
   _buildBody(BuildContext context) {
+    final state = ref.watch(principalProvider);
+
+    // final state = ref.read(principalProvider.notifier).state;
+
+    final stateFinal = ref.read(principalProvider.notifier);
+    //stateFinal.setIsActive(true);
     return Column(
       children: [
-        const SizedBox(height: 120),
+        const SizedBox(height: 10),
         _buildTitle(context),
         _buildDescription(),
         const SizedBox(height: 40),
         _buildDropDown(),
         const SizedBox(height: 40),
-        _buildCustomGetLocalDocument(context),
+        _buildCustomGetLocalDocument(context, stateFinal),
         const SizedBox(height: 40),
-        _buildButton()
+        _buildPreviewDocumentList(state, stateFinal),
+        const SizedBox(height: 50),
+        _buildButton(stateFinal),
       ],
     );
   }
@@ -86,13 +102,20 @@ class _PrincipalScreenState extends State<PrincipalScreen> {
     );
   }
 
-  _buildCustomGetLocalDocument(BuildContext context) {
+  _buildCustomGetLocalDocument(
+      BuildContext context, PrincipalStateNotifier state) {
     return GestureDetector(
       onTap: () async {
         bool isPermission = await _validatePermission(context);
-        if (isPermission) {
-          FileUtil.pickFile(CustomFileType.PDF);
-          print("Oprimi el boton");
+        if (isPermission && state.state.listPath!.length < 3) {
+          final path = await FileUtil.pickFile();
+          state.setListPath(path!);
+        } else {
+          DialogUtil.showCustomDialog(
+              context: context,
+              title: "!Espera!",
+              description:
+                  "Has cumplido con el limite (3) para adjuntar documentos ");
         }
       },
       child: Container(
@@ -126,16 +149,6 @@ class _PrincipalScreenState extends State<PrincipalScreen> {
     );
   }
 
-  _buildTextVerify() {
-    bool isOfficial = true;
-    return Center(
-      child: isOfficial
-          ? const Text("El Documento es: ", style: TextStyle(color: Colors.grey),)
-          : Text(
-              "El documento es una vil mentira ladron de datos personales \n llamando a la policia....."),
-    );
-  }
-
   _buildDropDown() {
     return DropdownButton<String>(
       value: dropDownValue,
@@ -153,11 +166,11 @@ class _PrincipalScreenState extends State<PrincipalScreen> {
         });
       },
       items: <String>[
-        'Selecciona un tipo de documento',
-        'Cedula',
-        'Pasaporte',
-        'Licencia de conduccion',
-        'Cedula de extranjeria'
+        Parameters.itemDropDown1,
+        Parameters.itemDropDown2,
+        Parameters.itemDropDown3,
+        Parameters.itemDropDown4,
+        Parameters.itemDropDown5,
       ].map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
@@ -167,15 +180,70 @@ class _PrincipalScreenState extends State<PrincipalScreen> {
     );
   }
 
-  _buildButton() {
+  _buildButton(PrincipalStateNotifier state) {
     return CustomMainButton(
       text: "Validar",
       colorText: Colors.white,
       color: ColorConstants.primaryButtonColor,
       margin: const EdgeInsets.symmetric(horizontal: 16),
       onPressed: () {
-        print("Ir a login");
+        if (dropDownValue != Parameters.itemDropDown1 &&
+            state.state.listPath!.isNotEmpty) {
+          // TODO JM ENVIA PETICION A BACK
+          DialogUtil.showCustomDialog(
+              context: context,
+              title: "!Tus resultado estan listos!",
+              description:
+                  "Oprime el siguiente boton para descargar los resultados de la validacion");
+        } else {
+          DialogUtil.showCustomDialog(
+              context: context,
+              title: "!Ha ocurrido un error!",
+              description: dropDownValue == Parameters.itemDropDown1
+                  ? "Por favor seleccionar un tipo de documento"
+                  : "Por favor adjuntar al menos una imagen");
+        }
       },
+    );
+  }
+
+  _buildPreviewDocumentList(
+      PrincipalState state, PrincipalStateNotifier stateNotifier) {
+    return Center(
+      child: SizedBox(
+        height: 160.h,
+        child: ListView.builder(
+            padding: EdgeInsets.only(left: 32.w),
+            scrollDirection: Axis.horizontal,
+            itemCount: state.listPath!.length <= 3 ? state.listPath?.length : 3,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  ref
+                      .read(principalProvider.notifier)
+                      .removeElementListPath(index);
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(
+                      width: 2,
+                      color: Colors.grey,
+                    ),
+                    // Make rounded corners
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 0),
+                    child: Image.file(
+                      File(state.listPath![index]!),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              );
+            }),
+      ),
     );
   }
 }

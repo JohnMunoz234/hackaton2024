@@ -110,29 +110,13 @@ class CustomCenterDialog extends StatelessWidget {
         title,
         textAlign: TextAlign.center,
         style: const TextStyle(
-          color: Color(0xFFDAE4E5),
+          color: Colors.black,
           fontWeight: FontWeight.w700,
           fontSize: 16,
         ),
       ),
     );
   }
-
-  // TODO: HC 20240303 - Deshabilitar ilustración
-  /*Widget _buildImage() {
-    if (imagePath?.isNotEmpty == true) {
-      return Column(
-        children: [
-          const CustomSizedBoxSpace(heightPercent: 2),
-          SvgPicture.asset(
-            imagePath!,
-            fit: BoxFit.contain,
-          ),
-        ],
-      );
-    }
-    return Container();
-  }*/
 
   Widget _buildDescription() {
     return Column(

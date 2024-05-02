@@ -5,4 +5,8 @@ class Parameters {
   static String itemDropDown3 = 'Pasaporte';
   static String itemDropDown4 = 'Licencia de conduccion';
   static String itemDropDown5 = 'Cedula de extranjeria';
+  static String itemListFolderName1 = 'fotos cedulas';
+  static String itemListFolderName2 = 'camara';
+  static String itemListFolderName3 = 'pasaportes gse' ;
+
 }

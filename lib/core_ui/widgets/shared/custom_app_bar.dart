@@ -10,7 +10,9 @@ import 'custom_sized_box_space.dart';
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
   final Widget? leading;
+  final String? icon;
   final List<Widget> actions;
+  final VoidCallback? onTap;
   final Color backgroundColor;
   final bool forceMaterialTransparency;
 
@@ -18,7 +20,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     super.key,
     this.title,
     this.leading,
+    this.icon,
     this.actions = const [],
+    this.onTap,
     this.backgroundColor = ColorConstants.primaryBackgroundColor,
     this.forceMaterialTransparency = false,
   });
@@ -52,14 +56,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       automaticallyImplyLeading: false,
       actions: [
         CustomSizedBoxSpace(width: 16.w),
+
         title != null ? Expanded(child: widgetTitle) : const SizedBox.shrink(),
         if (title == null) Expanded(child: Container()),
         ...actionWidgets,
         Builder(
-          // TODO YP 20240305 Put enumerate icons
             builder: (context) => CustomAppbarIcon(
-              assetName: ImageConstants.icUserProfile,
-              onTap: () => Scaffold.of(context).openDrawer(),
+              assetName: icon ?? "",
+              onTap: onTap,
             )),
         CustomSizedBoxSpace(width: 20.w),
       ],

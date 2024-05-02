@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:hackaton_2024_mv/navigation/authentication_router.dart';
 import 'package:hackaton_2024_mv/navigation/base_routers.dart';
 import 'package:hackaton_2024_mv/navigation/nav_keys.dart';
 import 'package:hackaton_2024_mv/navigation/navigation_routes.dart';
@@ -12,6 +13,7 @@ class RouterNav {
     routes: <RouteBase>[
       ...BaseRoutes.goRoutes,
       ...NavigationRouters.goRoutes,
+      ...AuthenticationRouter.goRoutes,
     ],
   );
 }

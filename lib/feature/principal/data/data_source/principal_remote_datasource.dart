@@ -18,7 +18,8 @@ class PrincipalRemoteDatasource {
   // Envio de un documento
   Future<Either<ApiError, PrincipalResponseDto>> sendDocument(
       {required SendDocumentParams params}) async {
-    final headers = {'Content-Type': 'application/json'};
+    final headers = {'Content-Type': 'application/json',
+    'api-key':'xCLHuwo2GxZdHwSaC1DN5OcULRLRZVxPxx4m'};
 
     final resultPrincipal = await apiManager.post(
       url: PrincipalRemoteApiRoutes.sendDocument,
@@ -40,7 +41,8 @@ class PrincipalRemoteDatasource {
   // Envio de varios documentos
   Future<Either<ApiError, PrincipalResponseDto>> sendDocuments(
       {required SendDocumentsParams params}) async {
-    final headers = {'Content-Type': 'application/json'};
+    final headers = {'Content-Type': 'application/json',
+      'api-key':'xCLHuwo2GxZdHwSaC1DN5OcULRLRZVxPxx4m'};
 
     final resultPrincipal = await apiManager.post(
       url: PrincipalRemoteApiRoutes.sendDocuments,

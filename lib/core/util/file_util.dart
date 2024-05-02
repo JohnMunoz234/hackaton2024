@@ -1,28 +1,12 @@
 import 'package:file_picker/file_picker.dart';
-
-enum CustomFileType {
-  GENERAL_DOCUMENT,
-  PDF,
-}
+import 'package:hackaton_2024_mv/feature/principal/presentation/notifier/principal_provider.dart';
 
 class FileUtil {
-   static List<String> fileTypeDocumentsExtensions = ['doc', 'docx', 'pdf'];
+   static List<String> fileTypeDocumentsExtensions = ['png','jpg','jpeg'];
 
-  static Future<PlatformFile?> pickFile(CustomFileType fileType) async {
-    FileType fileTypeToPick;
-    List<String>? allowedExtensions;
-
-
-    switch (fileType) {
-      case CustomFileType.GENERAL_DOCUMENT:
-        fileTypeToPick = FileType.custom;
-        allowedExtensions = fileTypeDocumentsExtensions;
-        break;
-      case CustomFileType.PDF:
-        fileTypeToPick = FileType.custom;
-        allowedExtensions = ['pdf'];
-        break;
-    }
+  static Future<String?> pickFile() async {
+    FileType fileTypeToPick = FileType.custom;
+    List<String>? allowedExtensions  = fileTypeDocumentsExtensions;
 
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: fileTypeToPick,
@@ -30,7 +14,7 @@ class FileUtil {
     );
 
     if (result != null) {
-      return result.files.first;
+      return result.files.first.path;
     } else {
       return null;
     }

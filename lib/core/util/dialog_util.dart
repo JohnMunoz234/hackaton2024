@@ -5,10 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_center_dialog.dart';
 import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_sized_box_space.dart';
 
-
-
-
-
 class DialogUtil {
 
   static void showCustomDialog({

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hackaton_2024_mv/feature/document/presentation/screen/document_screen.dart';
 import 'package:hackaton_2024_mv/feature/folder/presentation/screen/folders_screen.dart';
 import 'package:hackaton_2024_mv/feature/principal/presentation/screen/principal_screen.dart';
 import 'package:hackaton_2024_mv/navigation/authentication_router.dart';
@@ -15,6 +16,11 @@ abstract class NavigationRouters {
       name: FoldersScreen.name,
       path: FoldersScreen.link,
       builder: (context, state) => const FoldersScreen(),
+    ),
+    GoRoute(
+      name: DocumentScreen.name,
+      path: DocumentScreen.link,
+      builder: (context, state) => const DocumentScreen(),
     )
   ];
 }

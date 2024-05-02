@@ -56,15 +56,15 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       automaticallyImplyLeading: false,
       actions: [
         CustomSizedBoxSpace(width: 16.w),
-
-        title != null ? Expanded(child: widgetTitle) : const SizedBox.shrink(),
-        if (title == null) Expanded(child: Container()),
-        ...actionWidgets,
         Builder(
             builder: (context) => CustomAppbarIcon(
               assetName: icon ?? "",
-              onTap: onTap,
+              onTap: onTap ?? () => Scaffold.of(context).openDrawer() ,
             )),
+        CustomSizedBoxSpace(width: 50.w),
+        title != null ? Expanded(child: widgetTitle) : const SizedBox.shrink(),
+        if (title == null) Expanded(child: Container()),
+        ...actionWidgets,
         CustomSizedBoxSpace(width: 20.w),
       ],
     );

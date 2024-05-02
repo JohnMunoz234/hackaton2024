@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,19 +10,18 @@ import 'package:hackaton_2024_mv/core/util/parameters.dart';
 import 'package:hackaton_2024_mv/core/util/permission_util.dart';
 import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom.main_button.dart';
 import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_app_bar.dart';
-import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_appbar_icon.dart';
-import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_document_item.dart';
-import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_sized_box_space.dart';
+import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_drawer.dart';
+import 'package:hackaton_2024_mv/feature/document/presentation/notifier/document_provider.dart';
 import 'package:hackaton_2024_mv/feature/folder/presentation/screen/folders_screen.dart';
 import 'package:hackaton_2024_mv/feature/principal/presentation/notifier/principal_provider.dart';
 import 'package:hackaton_2024_mv/resource/color_constants.dart';
 import 'package:hackaton_2024_mv/resource/image_constants.dart';
 
-class PrincipalScreen extends ConsumerStatefulWidget {
-  static const String name = 'PrincipalScreen';
+class DocumentScreen extends ConsumerStatefulWidget {
+  static const String name = 'DocumentScreen';
   static const String link = '/$name';
 
-  const PrincipalScreen({
+  const DocumentScreen({
     super.key,
   });
 
@@ -31,7 +29,7 @@ class PrincipalScreen extends ConsumerStatefulWidget {
   ConsumerState createState() => _PrincipalScreenState();
 }
 
-class _PrincipalScreenState extends ConsumerState<PrincipalScreen> {
+class _PrincipalScreenState extends ConsumerState<DocumentScreen> {
   String dropDownValue = Parameters.itemDropDown1;
 
   @override
@@ -39,6 +37,7 @@ class _PrincipalScreenState extends ConsumerState<PrincipalScreen> {
     return SafeArea(
       child: Scaffold(
         appBar: _buildAppBar(context),
+        drawer: _buildCustomDrawer(),
         body: _buildBody(context),
       ),
     );
@@ -47,11 +46,18 @@ class _PrincipalScreenState extends ConsumerState<PrincipalScreen> {
   _buildAppBar(BuildContext context) {
     return CustomAppBar(
       title: "DOCUSENSE IA",
-      icon: ImageConstants.icUserProfile,
-      onTap: () => {
-        context.pushReplacement(FoldersScreen.link)
+      icon: ImageConstants.icMenu,
+      onTap: null,
+    );
+  }
+
+  _buildCustomDrawer() {
+    return CustomDrawer(
+      onItemTapped: (index) {
+        ref.read(documentProvider.notifier).onDrawerItemTapped(context, index);
       },
-      );
+      folderOrDocument: false,
+    );
   }
 
   _buildBody(BuildContext context) {
@@ -115,7 +121,7 @@ class _PrincipalScreenState extends ConsumerState<PrincipalScreen> {
               context: context,
               title: "!Espera!",
               description:
-                  "Has cumplido con el limite (3) para adjuntar documentos ");
+              "Has cumplido con el limite (3) para adjuntar documentos ");
         }
       },
       child: Container(
@@ -131,20 +137,20 @@ class _PrincipalScreenState extends ConsumerState<PrincipalScreen> {
         ),
         child: const Center(
             child: Column(children: [
-          SizedBox(height: 40),
-          Image(
-            image: AssetImage(ImageConstants.icDocument1),
-            width: 40,
-            height: 40,
-            color: Colors.grey,
-          ),
-          SizedBox(height: 5),
-          Text(
-            "Haz tap aqui para seleccionar un documento",
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 40),
-        ])),
+              SizedBox(height: 40),
+              Image(
+                image: AssetImage(ImageConstants.icDocument1),
+                width: 40,
+                height: 40,
+                color: Colors.grey,
+              ),
+              SizedBox(height: 5),
+              Text(
+                "Haz tap aqui para seleccionar un documento",
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 40),
+            ])),
       ),
     );
   }
@@ -194,7 +200,7 @@ class _PrincipalScreenState extends ConsumerState<PrincipalScreen> {
               context: context,
               title: "!Tus resultado estan listos!",
               description:
-                  "Oprime el siguiente boton para descargar los resultados de la validacion");
+              "Oprime el siguiente boton para descargar los resultados de la validacion");
         } else {
           DialogUtil.showCustomDialog(
               context: context,

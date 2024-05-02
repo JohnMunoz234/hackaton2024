@@ -7,6 +7,7 @@ import 'package:hackaton_2024_mv/core/util/dialog_util.dart';
 import 'package:hackaton_2024_mv/core/util/parameters.dart';
 import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom.main_button.dart';
 import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_app_bar.dart';
+import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_drawer.dart';
 import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_item_list.dart';
 import 'package:hackaton_2024_mv/feature/folder/presentation/notifier/folder_provider.dart';
 import 'package:hackaton_2024_mv/resource/color_constants.dart';
@@ -25,8 +26,8 @@ class FoldersScreen extends ConsumerStatefulWidget {
 }
 
 class _FoldersScreenState extends ConsumerState<FoldersScreen> {
-
   String dropDownValue = Parameters.itemDropDown1;
+
   List<String> listNameFolder = [
     Parameters.itemListFolderName1,
     Parameters.itemListFolderName2,
@@ -40,32 +41,43 @@ class _FoldersScreenState extends ConsumerState<FoldersScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
-      appBar: _buildAppBar(context),
-      body: _buildBody(context),
-    ));
+          appBar: _buildAppBar(context),
+          drawer: _buildCustomDrawer(),
+          body: _buildBody(context),
+        ));
   }
 
   _buildAppBar(BuildContext context) {
-    return CustomAppBar(
+    return const CustomAppBar(
         title: "DOCUSENSE IA",
         icon: ImageConstants.icMenu,
-        onTap: () {
-          print("Aparece menu hamburguesa");
-        });
+        onTap: null);
+  }
+  _buildCustomDrawer() {
+    return CustomDrawer(
+      onItemTapped: (index) {
+        ref.read(folderProvider.notifier).onDrawerItemTapped(context, index );
+      },
+      folderOrDocument: true,
+    );
   }
 
   _buildBody(BuildContext context) {
-    return Column(children: [
-      const SizedBox(height: 20),
-      _buildTitle(context),
-      _buildDescription(),
-      const SizedBox(height: 20),
-      _buildDropDown(),
-      const SizedBox(height: 10),
-      _buildFoldersList(),
-      const SizedBox(height: 10),
-      _buildButton()
-    ]);
+    return SingleChildScrollView(
+      child: Column(children: [
+        const SizedBox(height: 20),
+        _buildTitle(context),
+        _buildDescription(),
+        const SizedBox(height: 20),
+        _buildDropDown(),
+        const SizedBox(height: 10),
+        _buildTextFieldSearch(),
+        const SizedBox(height: 10),
+        _buildFoldersList(),
+        const SizedBox(height: 10),
+        _buildButton()
+      ]),
+    );
   }
 
   _buildTitle(BuildContext context) {
@@ -86,18 +98,35 @@ class _FoldersScreenState extends ConsumerState<FoldersScreen> {
         style: TextStyle(fontWeight: FontWeight.w200, fontSize: 16.sp),
       ),
     );
-
-
   }
+
+  _buildTextFieldSearch() {
+    return Container(
+      width: 300.w,
+      height: 50,
+      padding: EdgeInsets.symmetric(horizontal: 20.w),
+      child: TextField(
+        decoration: const InputDecoration(
+          border: OutlineInputBorder(),
+          hintText: 'Ingresa un término de búsqueda',
+        ),
+        onChanged: (text) {
+          print(
+              '${ref.watch(folderProvider.notifier).getFoldersBySearch(text)}');
+        },
+      ),
+    );
+  }
+
   _buildDropDown() {
     return DropdownButton<String>(
       value: dropDownValue,
       icon: const Icon(Icons.arrow_circle_left_sharp, color: Colors.grey),
-      iconSize: 24,
+      iconSize: 18,
       elevation: 16,
       style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.w400),
       underline: Container(
-        height: 5,
+        height: 2,
         color: Colors.grey,
       ),
       onChanged: (String? newValue) {
@@ -114,38 +143,40 @@ class _FoldersScreenState extends ConsumerState<FoldersScreen> {
       ].map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
-          child: Text(value),
+          child: Text(
+            value,
+            style: const TextStyle(fontSize: 20),
+          ),
         );
       }).toList(),
     );
   }
-  
-  _buildFoldersList() {
-    final state = ref.read(folderProvider);
 
+  _buildFoldersList() {
+    final state = ref.watch(folderProvider);
     return SizedBox(
       width: 300.h,
       height: 450.h,
-      child:  ListView.builder(
+      child: ListView.builder(
           padding: EdgeInsets.symmetric(horizontal: 16.sp),
           scrollDirection: Axis.vertical,
-          itemCount: listNameFolder.length,
+          itemCount: state.listFolders?.length ?? 0,
           itemBuilder: (context, index) {
             return GestureDetector(
               onTap: () {
-                ref.read(folderProvider.notifier).setWasPressed(true);
                 print("Tap en folder");
               },
               child: Container(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(vertical:10),
+                  padding: EdgeInsets.symmetric(vertical: 10),
                   child: CustomItemList(
-                    folderName: listNameFolder[index],
+                    folderName: state.listFolders![index].name!,
                     icon: ImageConstants.icFolder,
                     onPressed: () {
+                      ref.watch(folderProvider.notifier).setWasPressed(index);
                       print('Internal Tap');
                     },
-                    wasPressed: state.wasPressed,
+                    wasPressed: state.listFolders?[index].isPressed,
                   ),
                 ),
               ),
@@ -155,13 +186,15 @@ class _FoldersScreenState extends ConsumerState<FoldersScreen> {
   }
 
   _buildButton() {
+    final state = ref.watch(folderProvider.notifier);
     return CustomMainButton(
       text: "Validar",
       colorText: Colors.white,
       color: ColorConstants.primaryButtonColor,
       margin: const EdgeInsets.symmetric(horizontal: 16),
       onPressed: () {
-        if (dropDownValue != Parameters.itemDropDown1) {
+        if (dropDownValue != Parameters.itemDropDown1 &&
+            state.getSelectFolders() != null) {
           // TODO JM ENVIA PETICION A BACK
           DialogUtil.showCustomDialog(
               context: context,
@@ -174,11 +207,9 @@ class _FoldersScreenState extends ConsumerState<FoldersScreen> {
               title: "!Ha ocurrido un error!",
               description: dropDownValue == Parameters.itemDropDown1
                   ? "Por favor seleccionar un tipo de documento"
-                  : "Por favor adjuntar al menos una imagen");
+                  : "Por favor selecciona una carpeta");
         }
       },
     );
   }
-  
-  
 }

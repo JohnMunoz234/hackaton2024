@@ -7,6 +7,7 @@ class ApiResponse<T> {
   final int? statusCode;
   final String? statusMessage;
   final String? statusDescription;
+  @JsonKey(name: 'class')
   final T result;
 
   const ApiResponse({
@@ -17,6 +18,7 @@ class ApiResponse<T> {
   });
 
   factory ApiResponse.fromJson(
-          Map<String, dynamic> json, T Function(dynamic json) fromJsonT) =>
-      _$ApiResponseFromJson<T>(json, fromJsonT);
+          Map<String, dynamic> json, T Function(dynamic json) fromJsonT) {
+    return _$ApiResponseFromJson<T>(json, fromJsonT);
+  }
 }

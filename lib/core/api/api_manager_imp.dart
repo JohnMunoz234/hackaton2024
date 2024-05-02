@@ -60,6 +60,31 @@ class ApiManagerImp extends ApiManager {
   }
 
   @override
+  Future<Either<ApiError, ApiResponseMap>> postObjetBody({
+    required String url,
+    Map<String, dynamic>? headers,
+    Object? body,
+  }) async {
+    try {
+      final response = await dio.post(
+        url,
+        data: body,
+        options: Options(
+          headers: headers,
+        ),
+      );
+      return Right(tryCast<Map<String, dynamic>>(response.data) ?? {});
+    } on DioException catch (e) {
+      return Left(
+        ApiError(
+          message: e.message ?? e.error?.toString() ?? "",
+          statusCode: e.response?.statusCode ?? 400,
+        ),
+      );
+    }
+  }
+
+  @override
   Future<Either<ApiError, ApiResponseMap>> put({
     required String url,
     Map<String, dynamic>? headers,

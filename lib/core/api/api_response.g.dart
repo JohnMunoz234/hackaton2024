@@ -14,5 +14,5 @@ ApiResponse<T> _$ApiResponseFromJson<T>(
       statusCode: (json['statusCode'] as num?)?.toInt(),
       statusDescription: json['statusDescription'] as String?,
       statusMessage: json['statusMessage'] as String?,
-      result: fromJsonT(json['result']),
+      result: fromJsonT(json['class']),
     );

@@ -1,33 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hackaton_2024_mv/core/util/dialog_util.dart';
+import 'package:hackaton_2024_mv/core_ui/colors/color_constants.dart';
+import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_app_bar.dart';
 import 'package:hackaton_2024_mv/feature/auth/login/presentation/notifier/login_state_provider.dart';
+import 'package:hackaton_2024_mv/feature/folder/presentation/screen/folders_screen.dart';
+import 'package:hackaton_2024_mv/feature/principal/presentation/screen/principal_screen.dart';
+import 'package:hackaton_2024_mv/resource/image_constants.dart';
 
 class LoginScreen extends StatelessWidget {
+  static const String name = 'LoginScreen';
+  static const String link = '/$name';
+
   const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.lightBlue,
+      backgroundColor: ColorConstants.primaryButtonColor,
+      appBar: _buildAppBar(context),
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CustomHero(),
-            Container(
-              margin: const EdgeInsets.all(16.0),
-              padding: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8.0),
-                color: Colors.white,
-              ),
-              child: const FormLogin(),
-            )
-          ],
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const CustomHero(),
+                Container(
+                  margin: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8.0),
+                    color: Colors.white,
+                  ),
+                  child: const FormLogin(),
+                )
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
+}
+
+_buildAppBar(BuildContext context) {
+  return CustomAppBar(
+    title: "DOCUSENSE IA",
+    icon: ImageConstants.icBack,
+    onTap: () => {context.pushReplacement(PrincipalScreen.link)},
+  );
 }
 
 class CustomHero extends StatelessWidget {
@@ -47,7 +70,10 @@ class CustomHero extends StatelessWidget {
             color: Colors.white,
           ),
           SizedBox(width: 16.0),
-          Text('Login Screen'),
+          Text(
+            'Login',
+            style: TextStyle(color: Colors.white),
+          ),
         ],
       ),
     );
@@ -113,7 +139,22 @@ class FormLogin extends ConsumerWidget {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  ref.read(loginStateProvider.notifier).login();
+                  ref.read(loginStateProvider.notifier).login(
+                    onSuccess: () {
+                      context.pushReplacement(FoldersScreen.link);
+                    },
+                    onFailed: () {
+                      DialogUtil.showCustomDialog(
+                        context: context,
+                        title: 'Usuario no válido',
+                        description: 'Verifica los datos e intenta nuevamente',
+                        primaryButtonText: 'Cerrar',
+                        onPressedPrimaryButton: () {
+                          context.pop();
+                        },
+                      );
+                    },
+                  );
                 },
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all(Color(0xFF86efac)),
@@ -125,7 +166,10 @@ class FormLogin extends ConsumerWidget {
                   padding: MaterialStateProperty.all(
                       const EdgeInsets.symmetric(vertical: 12.0)),
                 ),
-                child: const Text('Login'),
+                child: const Text(
+                  'Login',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ),
           ],

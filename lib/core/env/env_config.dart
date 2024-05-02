@@ -7,7 +7,7 @@ class EnvConfig {
   static late String baseUrl;
 
   static init() {
-    baseUrl = const String.fromEnvironment("BASE_URL");
+    baseUrl = const String.fromEnvironment("https://docusenseai-api.gse.com.co");
     String envName = const String.fromEnvironment("APP_CONFIG_ENV");
     if (envName.isEmpty) {
       envName = Environment.dev.name;

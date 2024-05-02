@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,10 +10,7 @@ import 'package:hackaton_2024_mv/core/util/parameters.dart';
 import 'package:hackaton_2024_mv/core/util/permission_util.dart';
 import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom.main_button.dart';
 import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_app_bar.dart';
-import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_appbar_icon.dart';
-import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_document_item.dart';
-import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_sized_box_space.dart';
-import 'package:hackaton_2024_mv/feature/folder/presentation/screen/folders_screen.dart';
+import 'package:hackaton_2024_mv/feature/auth/login/presentation/screen/login_screen.dart';
 import 'package:hackaton_2024_mv/feature/principal/presentation/notifier/principal_provider.dart';
 import 'package:hackaton_2024_mv/resource/color_constants.dart';
 import 'package:hackaton_2024_mv/resource/image_constants.dart';
@@ -36,6 +32,43 @@ class _PrincipalScreenState extends ConsumerState<PrincipalScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(principalProvider, (previous, next) {
+      if (previous is! PrincipalState) return;
+
+      if (previous.showDialog == next.showDialog) {
+        return;
+      }
+
+      if (mounted &&
+          next.showDialog.showDialogEnum == ShowDialogEnum.dialogResult) {
+        context.pop();
+        DialogUtil.showCustomDialog(
+          context: context,
+          title: "!Tus resultado estan listos!",
+          description:
+              "El documento que has proporcionado es: ${next.showDialog.message}",
+        );
+      }
+
+      if (mounted && next.showDialog.showDialogEnum == ShowDialogEnum.loading) {
+        DialogUtil.showCustomDialog(
+          context: context,
+          isCancelable: false,
+          title: 'Procesando...',
+          description: 'Esperando resultado de verificación',
+        );
+      }
+
+      if (mounted && next.showDialog.showDialogEnum == ShowDialogEnum.error) {
+        context.pop();
+        DialogUtil.showCustomDialog(
+          context: context,
+          title: 'Tenemos algunos inconvenientes',
+          description: 'No fue posible completar la verificación',
+        );
+      }
+    });
+
     return SafeArea(
       child: Scaffold(
         appBar: _buildAppBar(context),
@@ -48,10 +81,8 @@ class _PrincipalScreenState extends ConsumerState<PrincipalScreen> {
     return CustomAppBar(
       title: "DOCUSENSE IA",
       icon: ImageConstants.icUserProfile,
-      onTap: () => {
-        context.pushReplacement(FoldersScreen.link)
-      },
-      );
+      onTap: () => {context.pushReplacement(LoginScreen.link)},
+    );
   }
 
   _buildBody(BuildContext context) {
@@ -153,11 +184,11 @@ class _PrincipalScreenState extends ConsumerState<PrincipalScreen> {
     return DropdownButton<String>(
       value: dropDownValue,
       icon: const Icon(Icons.arrow_circle_left_sharp, color: Colors.grey),
-      iconSize: 24,
+      iconSize: 18,
       elevation: 16,
       style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.w400),
       underline: Container(
-        height: 5,
+        height: 2,
         color: Colors.grey,
       ),
       onChanged: (String? newValue) {
@@ -174,7 +205,10 @@ class _PrincipalScreenState extends ConsumerState<PrincipalScreen> {
       ].map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
           value: value,
-          child: Text(value),
+          child: Text(
+            value,
+            style: const TextStyle(fontSize: 20),
+          ),
         );
       }).toList(),
     );
@@ -190,11 +224,12 @@ class _PrincipalScreenState extends ConsumerState<PrincipalScreen> {
         if (dropDownValue != Parameters.itemDropDown1 &&
             state.state.listPath!.isNotEmpty) {
           // TODO JM ENVIA PETICION A BACK
-          DialogUtil.showCustomDialog(
-              context: context,
-              title: "!Tus resultado estan listos!",
-              description:
-                  "Oprime el siguiente boton para descargar los resultados de la validacion");
+          if (state.state.listPath?.length == 1) {
+            state.sendDocument(state.state.listPath!.first, dropDownValue);
+          } else {
+            state.sendDocuments(context, dropDownValue);
+          }
+
         } else {
           DialogUtil.showCustomDialog(
               context: context,

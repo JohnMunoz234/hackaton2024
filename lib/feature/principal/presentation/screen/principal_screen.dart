@@ -192,12 +192,12 @@ class _PrincipalScreenState extends ConsumerState<PrincipalScreen> {
         if (dropDownValue != Parameters.itemDropDown1 &&
             state.state.listPath!.isNotEmpty) {
           // TODO JM ENVIA PETICION A BACK
-          state.sendDocument(state.state.listPath!.first, dropDownValue);
-          DialogUtil.showCustomDialog(
-              context: context,
-              title: "!Tus resultado estan listos!",
-              description:
-                  "Oprime el siguiente boton para descargar los resultados de la validacion");
+          if (state.state.listPath?.length == 1) {
+            state.sendDocument(context, state.state.listPath!.first, dropDownValue);
+          } else {
+            state.sendDocuments(context, dropDownValue);
+          }
+
         } else {
           DialogUtil.showCustomDialog(
               context: context,

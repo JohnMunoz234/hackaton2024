@@ -4,7 +4,6 @@ import 'package:hackaton_2024_mv/app/main_app.dart';
 
 void main() {
   final container = ProviderContainer();
-
   runApp(
     ProviderScope(
       parent: container,

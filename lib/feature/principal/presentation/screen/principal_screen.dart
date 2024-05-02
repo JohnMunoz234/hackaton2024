@@ -14,6 +14,8 @@ import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_app_bar.dart';
 import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_appbar_icon.dart';
 import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_document_item.dart';
 import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_sized_box_space.dart';
+import 'package:hackaton_2024_mv/feature/auth/login/domain/use_case/login.dart';
+import 'package:hackaton_2024_mv/feature/auth/login/presentation/screen/login_screen.dart';
 import 'package:hackaton_2024_mv/feature/folder/presentation/screen/folders_screen.dart';
 import 'package:hackaton_2024_mv/feature/principal/presentation/notifier/principal_provider.dart';
 import 'package:hackaton_2024_mv/resource/color_constants.dart';
@@ -49,7 +51,7 @@ class _PrincipalScreenState extends ConsumerState<PrincipalScreen> {
       title: "DOCUSENSE IA",
       icon: ImageConstants.icUserProfile,
       onTap: () => {
-        context.pushReplacement(FoldersScreen.link)
+        context.pushReplacement(LoginScreen.link)
       },
       );
   }
@@ -190,6 +192,7 @@ class _PrincipalScreenState extends ConsumerState<PrincipalScreen> {
         if (dropDownValue != Parameters.itemDropDown1 &&
             state.state.listPath!.isNotEmpty) {
           // TODO JM ENVIA PETICION A BACK
+          state.sendDocument(state.state.listPath!.first, dropDownValue);
           DialogUtil.showCustomDialog(
               context: context,
               title: "!Tus resultado estan listos!",

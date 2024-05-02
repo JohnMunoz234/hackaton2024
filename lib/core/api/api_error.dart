@@ -9,4 +9,9 @@ class ApiError {
 
   factory ApiError.asDefault() =>
       const ApiError(message: "Ocurrio un problema", statusCode: 400);
+
+  @override
+  String toString() {
+    return 'ApiError{message: $message, statusCode: $statusCode}';
+  }
 }

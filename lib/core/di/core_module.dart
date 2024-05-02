@@ -6,7 +6,7 @@ import 'package:hackaton_2024_mv/core/env/env_config.dart';
 
 final _dioProvider = Provider((ref) => Dio(
       BaseOptions(
-        baseUrl: EnvConfig.baseUrl,
+        baseUrl: "https://docusenseai-api.gse.com.co",
         connectTimeout: const Duration(seconds: 60),
         receiveTimeout: const Duration(seconds: 60),
       ),

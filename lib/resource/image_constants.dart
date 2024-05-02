@@ -7,5 +7,6 @@ class ImageConstants {
   static const String icMenu = 'assets/images/menu.svg';
   static const String icFolder = 'assets/images/ic_folder.svg';
   static const String icLogout = 'assets/images/ic_logout_dark.svg';
+  static const String icBack = 'assets/images/flecha.svg';
 
 }

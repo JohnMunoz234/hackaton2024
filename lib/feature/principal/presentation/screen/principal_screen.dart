@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hackaton_2024_mv/core/util/dialog_util.dart';
 import 'package:hackaton_2024_mv/core/util/file_util.dart';
 import 'package:hackaton_2024_mv/core/util/parameters.dart';
@@ -13,6 +14,7 @@ import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_app_bar.dart';
 import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_appbar_icon.dart';
 import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_document_item.dart';
 import 'package:hackaton_2024_mv/core_ui/widgets/shared/custom_sized_box_space.dart';
+import 'package:hackaton_2024_mv/feature/folder/presentation/screen/folders_screen.dart';
 import 'package:hackaton_2024_mv/feature/principal/presentation/notifier/principal_provider.dart';
 import 'package:hackaton_2024_mv/resource/color_constants.dart';
 import 'package:hackaton_2024_mv/resource/image_constants.dart';
@@ -45,13 +47,11 @@ class _PrincipalScreenState extends ConsumerState<PrincipalScreen> {
   _buildAppBar(BuildContext context) {
     return CustomAppBar(
       title: "DOCUSENSE IA",
-      leading: CustomAppbarIcon(
-        assetName: ImageConstants.imageLogoTrueId,
-        onTap: () async {
-          Navigator.pop(context);
-        },
-      ),
-    );
+      icon: ImageConstants.icUserProfile,
+      onTap: () => {
+        context.pushReplacement(FoldersScreen.link)
+      },
+      );
   }
 
   _buildBody(BuildContext context) {
